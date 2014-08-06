@@ -120,6 +120,7 @@ void SiPixelGaussianSmearingRecHitConverterAlgorithm::smearHit(
 
   // alpha: angle with respect to local x axis in local (x,z) plane
   float cotalpha = locx/locz;
+  cout << cotalpha;
   if ( isFlipped( detUnit ) ) { // &&& check for FPIX !!!
 #ifdef FAMOS_DEBUG
     std::cout << " isFlipped " << std::endl;
