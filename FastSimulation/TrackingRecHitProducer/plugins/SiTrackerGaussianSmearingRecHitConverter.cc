@@ -69,8 +69,8 @@ SiTrackerGaussianSmearingRecHitConverter::SiTrackerGaussianSmearingRecHitConvert
   : pset_(conf)
 {
   thePixelDataFile = 0;
-  thePixelBarrelResolutionFile = 0;
-  thePixelForwardResolutionFile = 0;
+  //  thePixelBarrelResolutionFile = 0;
+  //thePixelForwardResolutionFile = 0;
   thePixelBarrelParametrization = 0;
   thePixelEndcapParametrization = 0;
   theSiStripErrorParametrization = 0;
@@ -330,8 +330,8 @@ void SiTrackerGaussianSmearingRecHitConverter::loadPixelData() {
   // load multiplicity cumulative probabilities
   // root files
   thePixelDataFile              = new TFile ( edm::FileInPath( thePixelMultiplicityFileName      ).fullPath().c_str() , "READ" );
-  thePixelBarrelResolutionFile  = new TFile ( edm::FileInPath( thePixelBarrelResolutionFileName  ).fullPath().c_str() , "READ" );
-  thePixelForwardResolutionFile = new TFile ( edm::FileInPath( thePixelForwardResolutionFileName ).fullPath().c_str() , "READ" );
+  //  thePixelBarrelResolutionFile  = new TFile ( edm::FileInPath( thePixelBarrelResolutionFileName  ).fullPath().c_str() , "READ" );
+  // thePixelForwardResolutionFile = new TFile ( edm::FileInPath( thePixelForwardResolutionFileName ).fullPath().c_str() , "READ" );
   //
 
   // alpha barrel
@@ -465,8 +465,8 @@ SiTrackerGaussianSmearingRecHitConverter::~SiTrackerGaussianSmearingRecHitConver
   theForwardMultiplicityBetaCumulativeProbabilities.clear();
   
   if(thePixelDataFile) delete thePixelDataFile;
-  if(thePixelBarrelResolutionFile) delete thePixelBarrelResolutionFile;
-  if(thePixelForwardResolutionFile) delete thePixelForwardResolutionFile;
+  //  if(thePixelBarrelResolutionFile) delete thePixelBarrelResolutionFile;
+  //if(thePixelForwardResolutionFile) delete thePixelForwardResolutionFile;
   if(thePixelBarrelParametrization) delete thePixelBarrelParametrization;
   if(thePixelEndcapParametrization) delete thePixelEndcapParametrization;
   if(theSiStripErrorParametrization) delete theSiStripErrorParametrization;
@@ -496,19 +496,23 @@ SiTrackerGaussianSmearingRecHitConverter::beginRun(edm::Run const&, const edm::E
 
   // For new parameterization: select multiplicity and resolution files according to magnetic field
   if(useCMSSWPixelParameterization) {
+    std::cout << "ALICE REMOVE: Using CMSSW Pixel Param" << std::endl;
     if(magFieldAtCenter > 3.9) {
+      std::cout << "ALICE REMOVE: magfield at center > 3.9" << std::endl;
       thePixelMultiplicityFileName = pset_.getParameter<std::string>( "PixelMultiplicityFile40T");
-      thePixelBarrelResolutionFileName = pset_.getParameter<std::string>( "PixelBarrelResolutionFile40T");
-      thePixelForwardResolutionFileName = pset_.getParameter<std::string>( "PixelForwardResolutionFile40T");
+      //  thePixelBarrelResolutionFileName = pset_.getParameter<std::string>( "PixelBarrelResolutionFile40T");
+      // thePixelForwardResolutionFileName = pset_.getParameter<std::string>( "PixelForwardResolutionFile40T");
     } else {
+      std::cout << "ALICE REMOVE: magfield at center <= 3.9" << std::endl;
       thePixelMultiplicityFileName = pset_.getParameter<std::string>( "PixelMultiplicityFile38T");
-      thePixelBarrelResolutionFileName = pset_.getParameter<std::string>( "PixelBarrelResolutionFile38T");      
-      thePixelForwardResolutionFileName = pset_.getParameter<std::string>( "PixelForwardResolutionFile38T");
+      // thePixelBarrelResolutionFileName = pset_.getParameter<std::string>( "PixelBarrelResolutionFile38T");      
+      //thePixelForwardResolutionFileName = pset_.getParameter<std::string>( "PixelForwardResolutionFile38T");
     }
   } else {
+    std::cout << "ALICE REMOVE: not using CMSSW Pixel Param" << std::endl;
     thePixelMultiplicityFileName = pset_.getParameter<std::string>( "PixelMultiplicityFile" );
-    thePixelBarrelResolutionFileName = pset_.getParameter<std::string>( "PixelBarrelResolutionFile");
-    thePixelForwardResolutionFileName = pset_.getParameter<std::string>( "PixelForwardResolutionFile");
+    //thePixelBarrelResolutionFileName = pset_.getParameter<std::string>( "PixelBarrelResolutionFile");
+    //thePixelForwardResolutionFileName = pset_.getParameter<std::string>( "PixelForwardResolutionFile");
   }
 
 
@@ -549,7 +553,8 @@ SiTrackerGaussianSmearingRecHitConverter::beginRun(edm::Run const&, const edm::E
 	    << std::endl;
 
   std::cout << "Barrel Pixel resolution data are taken from file " 
-	    << thePixelBarrelResolutionFileName << "\n"
+    //	    << thePixelBarrelResolutionFileName 
+	    << "\n"
 	    << "Alpha bin min = " << resAlphaBarrel_binMin
 	    << "\twidth = "       << resAlphaBarrel_binWidth
 	    << "\tbins = "        << resAlphaBarrel_binN
@@ -560,7 +565,8 @@ SiTrackerGaussianSmearingRecHitConverter::beginRun(edm::Run const&, const edm::E
 	    << std::endl;
 
   std::cout << "Forward Pixel resolution data are taken from file " 
-	    << thePixelForwardResolutionFileName << "\n"
+    //	    << thePixelForwardResolutionFileName 
+	    << "\n"
 	    << "Alpha bin min = " << resAlphaForward_binMin
 	    << "\twidth = "       << resAlphaForward_binWidth
 	    << "\tbins = "        << resAlphaForward_binN

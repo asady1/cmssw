@@ -129,11 +129,11 @@ class SiTrackerGaussianSmearingRecHitConverter : public edm::stream::EDProducer 
   //
   // Pixel
   std::string thePixelMultiplicityFileName;
-  std::string thePixelBarrelResolutionFileName;
-  std::string thePixelForwardResolutionFileName;
+  //  std::string thePixelBarrelResolutionFileName;
+  //  std::string thePixelForwardResolutionFileName;
   TFile* thePixelDataFile;
-  TFile* thePixelBarrelResolutionFile;
-  TFile* thePixelForwardResolutionFile;
+  //  TFile* thePixelBarrelResolutionFile;
+  //TFile* thePixelForwardResolutionFile;
   //
   // multiplicity bins
   unsigned int nAlphaBarrel, nBetaBarrel, nAlphaForward, nBetaForward;
