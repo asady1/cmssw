@@ -32,15 +32,15 @@ process.recHitProducerSimple=cms.EDProducer("TrackingRecHitProducer",
         cms.PSet(
             name = cms.string("noSmearing"),
             type=cms.string("TrackingRecHitNoSmearingPlugin"),
-            select=cms.string("subdetId==BPX")
+            select=cms.string("subdetId==FPX")
         ),
         
         cms.PSet(
-            name = cms.string("BPXmonitor"),
+            name = cms.string("FPXmonitor"),
             type=cms.string("TrackingRecHitMonitorPlugin"),
             xmax=cms.double(5.0),
             ymax=cms.double(5.0),
-            select=cms.string("subdetId==BPX"),
+            select=cms.string("subdetId==FPX"),
 
         )
     )
@@ -51,8 +51,8 @@ process.recHitProducerTemplates=cms.EDProducer("TrackingRecHitProducer",
     simHits = cms.InputTag("famosSimHits","TrackerHits"),
     plugins=cms.VPSet(
         cms.PSet(
-            name = cms.string("pixelBarrelSmearer"),
-            type=cms.string("PixelBarrelTemplateSmearerPlugin"),
+            name = cms.string("pixelForwardSmearer"),
+            type=cms.string("PixelForwardTemplateSmearerPlugin"),
             NewPixelBarrelResolutionFile1 = cms.string('FastSimulation/TrackingRecHitProducer/data/NewPixelResolutionBarrel38T.root'),
             NewPixelBarrelResolutionFile2 = cms.string('FastSimulation/TrackingRecHitProducer/data/NewPixelResolutionBarrelEdge38T.root'),
             NewPixelBarrelResolutionFile3 = cms.string('FastSimulation/TrackingRecHitProducer/data/PixelBarrelResolution2014.root'),
@@ -61,17 +61,21 @@ process.recHitProducerTemplates=cms.EDProducer("TrackingRecHitProducer",
             UseCMSSWPixelParametrization = cms.bool(True),
             probfilebarrel = cms.string('FastSimulation/TrackingRecHitProducer/data/bmergeprob.root'),
             probfileforward = cms.string('FastSimulation/TrackingRecHitProducer/data/fmergeprob.root'),
+            pixelresxmergedbarrel = cms.string('FastSimulation/TrackingRecHitProducer/data/bxsmear.root'),
+            pixelresxmergedforward = cms.string('FastSimulation/TrackingRecHitProducer/data/fxsmear.root'),
+            pixelresymergedbarrel = cms.string('FastSimulation/TrackingRecHitProducer/data/bysmear.root'),
+            pixelresymergedforward = cms.string('FastSimulation/TrackingRecHitProducer/data/fysmear.root'),
             templateIdBarrel = cms.int32( 40 ),
             templateIdForward  = cms.int32( 41 ),
-            select=cms.string("subdetId==BPX"),
+            select=cms.string("subdetId==FPX"),
         ),
         
         cms.PSet(
-            name = cms.string("BPXmonitor"),
+            name = cms.string("FPXmonitor"),
             type=cms.string("TrackingRecHitMonitorPlugin"),
             xmax=cms.double(5.0),
             ymax=cms.double(5.0),
-            select=cms.string("subdetId==BPX"),
+            select=cms.string("subdetId==FPX"),
 
         )
     )
