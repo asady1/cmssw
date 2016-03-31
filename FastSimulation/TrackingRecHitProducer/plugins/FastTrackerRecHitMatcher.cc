@@ -101,6 +101,10 @@ void FastTrackerRecHitMatcher::produce(edm::Event& iEvent, const edm::EventSetup
     edm::Handle<FastTrackerRecHitRefCollection> simHit2RecHitMap;
     iEvent.getByToken(simHit2RecHitMapToken,simHit2RecHitMap);
     
+    /*    edm::ESHandle<TrackerGeometry> theMisAlignedGeometry;
+    iSetup.get<TrackerDigiGeometryRecord>().get("MisAligned",theMisAlignedGeometry);
+    misAlignedGeometry = &(*theMisAlignedGeometry);
+    */
     // output
     std::unique_ptr<FastTrackerRecHitCollection> output_recHits(new FastTrackerRecHitCollection);
     std::unique_ptr<FastTrackerRecHitRefCollection> output_simHit2RecHitMap(new FastTrackerRecHitRefCollection(simHit2RecHitMap->size(),FastTrackerRecHitRef()));

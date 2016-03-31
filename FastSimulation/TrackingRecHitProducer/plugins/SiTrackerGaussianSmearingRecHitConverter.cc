@@ -598,7 +598,7 @@ void SiTrackerGaussianSmearingRecHitConverter::produce(edm::Event& e, const edm:
   // by default, each simHit is associated to a null ref
   edm::RefProd<FastTrackerRecHitCollection> output_recHits_refProd = e.getRefBeforePut<FastTrackerRecHitCollection>();
   std::unique_ptr<FastTrackerRecHitRefCollection> output_recHitRefs(new FastTrackerRecHitRefCollection(allTrackerHits.size(),FastTrackerRecHitRef()));
-  std::cout << "number of sim hits: " << allTrackerHits.size() << std::endl;
+  //std::cout << "number of sim hits: " << allTrackerHits.size() << std::endl;
   // loop on PSimHits
   int nRecHits = 0;
   for (unsigned simHitCounter = 0;simHitCounter<allTrackerHits.size();++simHitCounter) {
@@ -640,6 +640,7 @@ void SiTrackerGaussianSmearingRecHitConverter::produce(edm::Event& e, const edm:
 										 subdet > 2 
 										 ? fastTrackerRecHitType::siStrip2D
 										 : fastTrackerRecHitType::siPixel));
+      std::cout << "rec hit local position error: " << recHit->localPositionError() << std::endl;
       recHit->addSimTrackId(simHit.trackId());
       recHit->setId(simHitCounter);
       output_recHits->push_back(recHit);
@@ -655,7 +656,7 @@ void SiTrackerGaussianSmearingRecHitConverter::produce(edm::Event& e, const edm:
   // put products in event
   e.put(std::move(output_recHits));
   e.put(std::move(output_recHitRefs),"simHit2RecHitMap");
-  std::cout << "size of rec hits: " << nRecHits << std::endl;
+  //std::cout << "size of rec hits: " << nRecHits << std::endl;
 }
 
 

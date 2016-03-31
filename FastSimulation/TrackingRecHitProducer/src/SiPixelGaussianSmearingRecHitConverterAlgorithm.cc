@@ -139,7 +139,7 @@ void SiPixelGaussianSmearingRecHitConverterAlgorithm::smearHit(
   float locx = localDir.x();
   float locy = localDir.y();
   float locz = localDir.z();
-  std::cout << "local simhit momentum : " << locx << " and " << locy << " and " << locz << std::endl;
+  //std::cout << "local simhit momentum : " << locx << " and " << locy << " and " << locz << std::endl;
   // alpha: angle with respect to local x axis in local (x,z) plane
   float cotalpha = locx/locz;
   if ( isFlipped( detUnit ) ) { // &&& check for FPIX !!!
@@ -147,7 +147,7 @@ void SiPixelGaussianSmearingRecHitConverterAlgorithm::smearHit(
     std::cout << " isFlipped " << std::endl;
 #endif
   }
-  std::cout << " detunit: " << detUnit << std::endl;
+  //  std::cout << " detunit: " << detUnit << std::endl;
   // beta: angle with respect to local y axis in local (y,z) plane
   float cotbeta = locy/locz;
   float sign=1.;
@@ -176,7 +176,7 @@ void SiPixelGaussianSmearingRecHitConverterAlgorithm::smearHit(
   const MeasurementPoint mp = rectPixelTopology->measurementPosition( lp );
   float mpy = mp.y();
   float mpx = mp.x();
-  std::cout << "measurement position simhit : " << mpy << " and " << mpx << std::endl;
+  //std::cout << "measurement position simhit : " << mpy << " and " << mpx << std::endl;
   //Get the center of the struck pixel in measurement position
   float pixelCenterY = 0.5 + (int)mpy;
   float pixelCenterX = 0.5 + (int)mpx;
@@ -371,7 +371,8 @@ void SiPixelGaussianSmearingRecHitConverterAlgorithm::smearHit(
   }
   theErrorZ = 1e-8; // 1 um means zero
   theError = LocalError( theErrorX*theErrorX, 0., theErrorY*theErrorY);
-  std::cout << "theError: " << theError << std::endl;
+  std::cout << "theError x " << theErrorX*1000. << std::endl;
+  std::cout << "theError y " << theErrorY*1000. << std::endl;
 // Local Error is 2D: (xx,xy,yy), square of sigma in first an third position 
   // as for resolution matrix
   //
@@ -477,7 +478,7 @@ void SiPixelGaussianSmearingRecHitConverterAlgorithm::smearHit(
       Local3DPoint(simHit.localPosition().x() + thePositionX , 
                    simHit.localPosition().y() + thePositionY , 
                    simHit.localPosition().z() + thePositionZ );
-    std::cout << "thePosition RecHit: " << thePosition.x() << " and " << thePosition.y() << " and " << thePosition.z() << std::endl;
+    //std::cout << "thePosition RecHit: " << thePosition.x() << " and " << thePosition.y() << " and " << thePosition.z() << std::endl;
 #ifdef FAMOS_DEBUG
     std::cout << " Detector bounds: "
               << "\t\tx = " << boundX

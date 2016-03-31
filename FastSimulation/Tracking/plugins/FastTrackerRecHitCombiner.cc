@@ -96,12 +96,13 @@ void
 
     //ALICE trying to debug and look at the maps
     for(auto recHitCombination : *output){
-      std::cout << "Going through outputs..." << std::endl;
+      std::cout << "Event" << std::endl;
       for(auto hit : recHitCombination){
-	std::cout << "simTrackId: " << hit->simTrackId(0) << std::endl;
+	//	std::cout << "simTrackId: " << hit->simTrackId(0) << std::endl;
 	TrajectorySeedHitCandidate currentTrackerHit;
 	currentTrackerHit = TrajectorySeedHitCandidate(hit.get(),trackerGeometry,trackerTopology);
-	std::cout << "Global position: " << currentTrackerHit.globalPosition() << std::endl;
+	//	std::cout << "Global position: " << currentTrackerHit.globalPosition() << std::endl;
+	//std::cout << "Local hit position error: " << hit.localPositionError().matrix() << std::endl;
       }
     }       
 

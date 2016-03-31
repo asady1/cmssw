@@ -142,6 +142,7 @@ void TrackingRecHitProducer::produce(edm::Event& event, const edm::EventSetup& e
             for (unsigned int irecHit = 0; irecHit < recHitToSimHitIdPairsList.size(); ++irecHit)
             {
                 output_recHits->push_back(recHitToSimHitIdPairsList[irecHit].first);
+		std::cout << "local position error TRHP: " << recHitToSimHitIdPairsList[irecHit].first.localPositionError() << std::endl;
                 const std::vector<TrackingRecHitProduct::SimHitIdPair>& simHitIdPairList = recHitToSimHitIdPairsList[irecHit].second;
                 for (unsigned int isimHit = 0; isimHit < simHitIdPairList.size(); ++isimHit)
                 {
