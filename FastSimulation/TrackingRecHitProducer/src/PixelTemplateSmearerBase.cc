@@ -13,6 +13,7 @@
 #include "FastSimulation/TrackingRecHitProducer/interface/PixelTemplateSmearerBase.h"
 #include "FastSimulation/TrackingRecHitProducer/interface/TrackingRecHitAlgorithmFactory.h"
 #include "FastSimulation/TrackingRecHitProducer/interface/TrackingRecHitProduct.h"
+#include "FastSimulation/TrackingRecHitProducer/interface/PixelResolutionHistograms.h"
 
 // Geometry
 #include "Geometry/CommonDetUnit/interface/GeomDetUnit.h"
@@ -49,16 +50,10 @@ PixelTemplateSmearerBase::PixelTemplateSmearerBase(
 
 PixelTemplateSmearerBase::~PixelTemplateSmearerBase()
 {
-    for (auto it = theXHistos.begin(); it != theXHistos.end(); ++it )
-    {
-        delete it->second;
-    }
-    for (auto it = theYHistos.begin(); it != theYHistos.end(); ++it )
-    {
-        delete it->second;
-    }
-    theXHistos.clear();
-    theYHistos.clear();
+  //--- The new histogram storage containers.
+  delete theEdgePixelResolutions;
+  delete theBigPixelResolutions;
+  delete theRegularPixelResolutions;
 }
 
 TrackingRecHitProductPtr 
@@ -253,7 +248,6 @@ FastSingleTrackerRecHit PixelTemplateSmearerBase::smearHit(
     const double boundY,
     RandomEngineAndDistribution const* random) const
 {
-
     // at the beginning the position is the Local Point in the local pixel module reference frame
     // same code as in PixelCPEBase
     LocalVector localDir = simHit.momentumAtEntry().unit();
@@ -547,100 +541,62 @@ FastSingleTrackerRecHit PixelTemplateSmearerBase::smearHit(
     if (cotalphaHistBin > (int)rescotAlpha_binN) cotalphaHistBin = (int)rescotAlpha_binN; 
     if (cotbetaHistBin  > (int)rescotBeta_binN) cotbetaHistBin  = (int)rescotBeta_binN; 
     //
-    unsigned int theXHistN;
-    unsigned int theYHistN;
+    ///unsigned int theXHistN;
+    ///unsigned int theYHistN;
 
-    if (!isForward)
-    {
-        if (edge)
-        {
-            theXHistN = cotalphaHistBin * 1000 + cotbetaHistBin * 10	 +  (nqbin+1);
-            theYHistN = theXHistN;	      
-        }
-        else
-        {
-            if (singlex)
-            {
-                if (hitbigx) theXHistN = 1 * 100000 + cotalphaHistBin * 100 + cotbetaHistBin ;
-                else theXHistN = 1 * 10000 + cotbetaHistBin * 10 + cotalphaHistBin ; 
-            }
-            else
-            {
-                if (hasBigPixelInX) theXHistN = 1 * 1000000 + 1 * 100000 + cotalphaHistBin * 1000 + cotbetaHistBin * 10 + (nqbin+1);
-                else theXHistN = 1 * 100000 + 1 * 10000 + cotbetaHistBin * 100 + cotalphaHistBin * 10 + (nqbin+1);
-            }
-            
-            if(singley)
-            {
-                if (hitbigy) theYHistN = 1 * 100000 + cotalphaHistBin * 100 + cotbetaHistBin ;
-                else theYHistN = 1 * 10000 + cotbetaHistBin * 10 + cotalphaHistBin ;
-            }
-            else
-            {
-                if (hasBigPixelInY) theYHistN = 1 * 1000000 + 1 * 100000 + cotalphaHistBin * 1000 + cotbetaHistBin * 10 + (nqbin+1);
-                else theYHistN = 1 * 100000 + 1 * 10000 + cotbetaHistBin * 100 + cotalphaHistBin * 10 + (nqbin+1);
-            }
-        }
-    }
-    else
-    {
-        if (edge)
-        {
-            theXHistN = cotalphaHistBin * 1000 +  cotbetaHistBin * 10 +  (nqbin+1);
-            theYHistN = theXHistN;
-        }
-        else
-        {
-            if (singlex)
-            {
-                if (hitbigx) theXHistN = 100000 + cotalphaHistBin * 100 + cotbetaHistBin;
-                else theXHistN = cotbetaHistBin * 10 + cotalphaHistBin;
-            }
-            else
-            {
-                theXHistN = 10000 + cotbetaHistBin * 100 +  cotalphaHistBin * 10 +  (nqbin+1);    
-            }
-           
-            if(singley)
-            {
-                if (hitbigy) theYHistN = 100000 + cotalphaHistBin * 100 + cotbetaHistBin;
-                else theYHistN = cotbetaHistBin * 10 + cotalphaHistBin;
-            }
-            else
-            {
-                theYHistN = 10000 + cotbetaHistBin * 100 +  cotalphaHistBin * 10 + (nqbin+1);
-            }
-        }
-    }
+
+    //--- Pointer to the set of histograms used to generate the rec hit positions
+    //    (for X and Y separately)
+    PixelResolutionHistograms * resHistsX = nullptr;
+    PixelResolutionHistograms * resHistsY = nullptr;
+
     
+    if (edge) {
+    resHistsX = resHistsY = theEdgePixelResolutions;
+    }
+    else {
+      //--- Decide resolution histogram set for X
+      if ( (singlex && hitbigx) || (!isForward && hasBigPixelInX) ) {
+	resHistsX = theBigPixelResolutions;
+      }
+      else {
+	resHistsX = theRegularPixelResolutions;
+      }
+      //--- Decide resolution histogram set for Y
+      if ( (singley && hitbigy) || (!isForward && hasBigPixelInY) ) {
+	resHistsY = theBigPixelResolutions;
+      }
+      else {
+	resHistsY = theRegularPixelResolutions;
+      }
+    }
+    //--- Get generators, separately for X and for Y.
+    const SimpleHistogramGenerator * xgen
+      = resHistsX->getGeneratorX( cotalpha, cotbeta, nqbin, singlex, edge );
+    const SimpleHistogramGenerator * ygen
+      = resHistsY->getGeneratorY( cotalpha, cotbeta, nqbin, singley, edge );
+
+    //--- Check if we found a histogram.  If nullptr, then throw up.
+    if ( !xgen || !ygen ) {
+      throw cms::Exception("FastSimulation/TrackingRecHitProducer")
+	<< "Histogram (" << cotalpha << " " << cotbeta << " " << nqbin << " " << isForward
+	<< ") was not found for PixelTemplateSmearer. Check if the smearing template exists.";
+    }
+
     
+    //--- Smear the hit Position.  We do it in the do-while loop in order to
+    //--- allow multiple tries, in case we generate a rec hit which is outside
+    //--- of the boundaries of the sensor.
     unsigned int retry = 0;
     
     do 
     {
-        //
-        // Smear the hit Position
-
-        std::map<unsigned int, const SimpleHistogramGenerator*>::const_iterator xgenIt = theXHistos.find(theXHistN);
-        std::map<unsigned int, const SimpleHistogramGenerator*>::const_iterator ygenIt = theYHistos.find(theYHistN);
-        if (xgenIt==theXHistos.cend() || ygenIt==theYHistos.cend())
-        {
-            throw cms::Exception("FastSimulation/TrackingRecHitProducer") << "Histogram ("<<theXHistN<<","<<theYHistN<<") was not found for PixelTemplateSmearer. Check if the smearing template exists.";
-        }
-
-
-        const SimpleHistogramGenerator* xgen = xgenIt->second;
-        const SimpleHistogramGenerator* ygen = ygenIt->second;
-
+        // Generate the position (x,y of the rec hit).
         thePositionX = xgen->generate(random);
         thePositionY = ygen->generate(random);
 
-
-        if( isForward )
-        {
-            thePositionY *= sign;
-        }
-        thePositionZ = 0.0; // set at the centre of the active area
+        if( isForward ) thePositionY *= sign;   // flip Y in forward &&& CHECK
+        thePositionZ = 0.0; // set to the mid-plane of the sensor.
 
         thePosition = Local3DPoint(
             simHit.localPosition().x() + thePositionX, 
@@ -806,6 +762,7 @@ smearMergeGroup(
 
 
     // random multiplicity for alpha and beta
+
     double qbinProbability = random->flatShoot();
     for(int i = 0; i<4; ++i)
     {

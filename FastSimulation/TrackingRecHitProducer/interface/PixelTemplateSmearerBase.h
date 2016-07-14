@@ -34,6 +34,7 @@
 class TFile;
 class RandomEngineAndDistribution;
 class SimpleHistogramGenerator;
+class PixelResolutionHistograms;
 
 class PixelTemplateSmearerBase:
     public TrackingRecHitAlgorithm
@@ -61,24 +62,32 @@ class PixelTemplateSmearerBase:
         int resqbin_binMin, resqbin_binWidth;
         unsigned int resqbin_binN;
         
+	// &&& The old storage mechanism: goes away.
+        ///std::map<unsigned int, const SimpleHistogramGenerator*> theXHistos;
+        ///std::map<unsigned int, const SimpleHistogramGenerator*> theYHistos;
 
-        std::map<unsigned int, const SimpleHistogramGenerator*> theXHistos;
-        std::map<unsigned int, const SimpleHistogramGenerator*> theYHistos;
-
-        TFile* theEdgePixelResolutionFile;
+	//--- The new histogram storage containers.
+        PixelResolutionHistograms * theEdgePixelResolutions;
         std::string theEdgePixelResolutionFileName;
-        TFile* theBigPixelResolutionFile;
+
+        PixelResolutionHistograms * theBigPixelResolutions;
         std::string theBigPixelResolutionFileName;
-        TFile* theRegularPixelResolutionFile;
+
+        PixelResolutionHistograms * theRegularPixelResolutions;
         std::string theRegularPixelResolutionFileName;
+	
+	//--- Files with hit merging information:
         TFile* theMergingProbabilityFile;
         std::string theMergingProbabilityFileName;
+
         TFile* theMergedPixelResolutionXFile;
         std::string theMergedPixelResolutionXFileName;
-        TFile* theMergedPixelResolutionYFile;                                                                                        
+
+        TFile* theMergedPixelResolutionYFile;                  
         std::string theMergedPixelResolutionYFileName;
 
-        unsigned int theLayer;
+	
+        unsigned int theLayer;   // &&& Why do we need this?
 
     public:
 

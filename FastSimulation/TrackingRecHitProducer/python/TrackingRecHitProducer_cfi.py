@@ -10,12 +10,12 @@ fastTrackerRecHits.plugins.append(
     cms.PSet(
         name = cms.string("pixelBarrelSmearer"),
         type=cms.string("PixelBarrelTemplateSmearerPlugin"),
-        BigPixelBarrelResolutionFile = cms.string('FastSimulation/TrackingRecHitProducer/data/NewPixelResolutionBarrel38T.root'),
-        EdgePixelBarrelResolutionFile = cms.string('FastSimulation/TrackingRecHitProducer/data/NewPixelResolutionBarrelEdge38T.root'),
-        RegularPixelBarrelResolutionFile = cms.string('FastSimulation/TrackingRecHitProducer/data/PixelBarrelResolution2014.root'),
-        BigPixelForwardResolutionFile = cms.string('FastSimulation/TrackingRecHitProducer/data/NewPixelResolutionForward38T.root'),
-        EdgePixelForwardResolutionFile = cms.string('FastSimulation/TrackingRecHitProducer/data/NewPixelResolutionForward38T.root'),
-        RegularPixelForwardResolutionFile = cms.string('FastSimulation/TrackingRecHitProducer/data/PixelForwardResolution2014.root'),
+        BigPixelBarrelResolutionFile = cms.string('FastSimulation/TrackingRecHitProducer/data/PixelResolutionBarrelBig.root'),
+        EdgePixelBarrelResolutionFile = cms.string('FastSimulation/TrackingRecHitProducer/data/PixelResolutionBarrelEdge.root'),
+        RegularPixelBarrelResolutionFile =cms.string('FastSimulation/TrackingRecHitProducer/data/PixelResolutionBarrelRegular.root'),
+        BigPixelForwardResolutionFile = cms.string('FastSimulation/TrackingRecHitProducer/data/PixelResolutionForwardBig.root'),
+        EdgePixelForwardResolutionFile = cms.string('FastSimulation/TrackingRecHitProducer/data/PixelResolutionForwardEdge.root'),
+        RegularPixelForwardResolutionFile =cms.string('FastSimulation/TrackingRecHitProducer/data/PixelResolutionForwardRegular.root'),
         UseCMSSWPixelParametrization = cms.bool(False),
         MergeHitsOn = cms.bool(False),
         MergingProbabilityBarrelFile = cms.string('FastSimulation/TrackingRecHitProducer/data/bmergeprob.root'),
@@ -33,12 +33,12 @@ fastTrackerRecHits.plugins.append(
     cms.PSet(
         name = cms.string("pixelForwardSmearer"),
         type=cms.string("PixelForwardTemplateSmearerPlugin"),
-        BigPixelBarrelResolutionFile = cms.string('FastSimulation/TrackingRecHitProducer/data/NewPixelResolutionBarrel38T.root'),
-        EdgePixelBarrelResolutionFile = cms.string('FastSimulation/TrackingRecHitProducer/data/NewPixelResolutionBarrelEdge38T.root'),
-        RegularPixelBarrelResolutionFile = cms.string('FastSimulation/TrackingRecHitProducer/data/PixelBarrelResolution2014.root'),
-        BigPixelForwardResolutionFile = cms.string('FastSimulation/TrackingRecHitProducer/data/NewPixelResolutionForward38T.root'),
-        EdgePixelForwardResolutionFile = cms.string('FastSimulation/TrackingRecHitProducer/data/NewPixelResolutionForward38T.root'),
-        RegularPixelForwardResolutionFile = cms.string('FastSimulation/TrackingRecHitProducer/data/PixelForwardResolution2014.root'),
+        BigPixelBarrelResolutionFile = cms.string('FastSimulation/TrackingRecHitProducer/data/PixelResolutionBarrelBig.root'),
+        EdgePixelBarrelResolutionFile = cms.string('FastSimulation/TrackingRecHitProducer/data/PixelResolutionBarrelEdge.root'),
+        RegularPixelBarrelResolutionFile =cms.string('FastSimulation/TrackingRecHitProducer/data/PixelResolutionBarrelRegular.root'),
+        BigPixelForwardResolutionFile = cms.string('FastSimulation/TrackingRecHitProducer/data/PixelResolutionForwardBig.root'),
+        EdgePixelForwardResolutionFile = cms.string('FastSimulation/TrackingRecHitProducer/data/PixelResolutionForwardEdge.root'),
+        RegularPixelForwardResolutionFile =cms.string('FastSimulation/TrackingRecHitProducer/data/PixelResolutionForwardRegular.root'),
         UseCMSSWPixelParametrization = cms.bool(False),
         MergeHitsOn = cms.bool(False),
         MergingProbabilityBarrelFile = cms.string('FastSimulation/TrackingRecHitProducer/data/bmergeprob.root'),
@@ -51,6 +51,7 @@ fastTrackerRecHits.plugins.append(
         select=cms.string("subdetId==FPX"),
     )
 )
+
 
 trackerStripGaussianResolutions={
     "TIB": {
@@ -94,3 +95,4 @@ for subdetId,trackerLayers in trackerStripGaussianResolutions.iteritems():
             select=cms.string("(subdetId=="+subdetId+") && (layer=="+str(trackerLayer)+")"),
         )
         fastTrackerRecHits.plugins.append(pluginConfig)
+

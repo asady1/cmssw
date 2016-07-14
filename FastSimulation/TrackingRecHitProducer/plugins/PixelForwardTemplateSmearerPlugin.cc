@@ -1,4 +1,3 @@
-
 /** PixelForwardTemplateSmearerPlugin.cc
  * ---------------------------------------------------------------------
  * Description:  see PixelForwardTemplateSmearerPlugin.h
@@ -15,6 +14,7 @@
 #include "FastSimulation/TrackingRecHitProducer/interface/PixelTemplateSmearerBase.h"
 #include "FastSimulation/TrackingRecHitProducer/interface/TrackingRecHitAlgorithmFactory.h"
 #include "FastSimulation/TrackingRecHitProducer/interface/TrackingRecHitProduct.h"
+#include "FastSimulation/TrackingRecHitProducer/interface/PixelResolutionHistograms.h"
 
 // Geometry
 //#include "Geometry/Records/interface/TrackerDigiGeometryRecord.h"
@@ -54,7 +54,7 @@ class PixelForwardTemplateSmearerPlugin:
           virtual ~PixelForwardTemplateSmearerPlugin();
 
     private:
-        void initializeForward();
+        void initialize();
 };
 
 
@@ -68,13 +68,12 @@ PixelForwardTemplateSmearerPlugin::PixelForwardTemplateSmearerPlugin(
 
     isForward = true;
 
+    //--- Resolution file names.
     theEdgePixelResolutionFileName = config.getParameter<string>( "EdgePixelForwardResolutionFile" );
-    theEdgePixelResolutionFile = new TFile( edm::FileInPath( theEdgePixelResolutionFileName ).fullPath().c_str()  ,"READ");
     theBigPixelResolutionFileName = config.getParameter<string>( "BigPixelForwardResolutionFile" );
-    theBigPixelResolutionFile = new TFile( edm::FileInPath( theBigPixelResolutionFileName ).fullPath().c_str()  ,"READ");
     theRegularPixelResolutionFileName = config.getParameter<string>( "RegularPixelForwardResolutionFile" );
-    theRegularPixelResolutionFile = new TFile( edm::FileInPath( theRegularPixelResolutionFileName ).fullPath().c_str()  ,"READ");
-    
+
+    //--- Hit merging info.
     theMergingProbabilityFileName = config.getParameter<string>( "MergingProbabilityForwardFile" );
     theMergingProbabilityFile =new TFile( edm::FileInPath( theMergingProbabilityFileName ).fullPath().c_str()  ,"READ");
     theMergedPixelResolutionXFileName = config.getParameter<string>( "MergedPixelForwardResolutionXFile" );
@@ -82,7 +81,7 @@ PixelForwardTemplateSmearerPlugin::PixelForwardTemplateSmearerPlugin(
     theMergedPixelResolutionYFileName = config.getParameter<string>( "MergedPixelForwardResolutionYFile" );
     theMergedPixelResolutionYFile = new TFile( edm::FileInPath( theMergedPixelResolutionYFileName ).fullPath().c_str()  ,"READ");
 
-    initializeForward();
+    initialize();
     
     
     
@@ -98,7 +97,7 @@ PixelForwardTemplateSmearerPlugin::~PixelForwardTemplateSmearerPlugin()
 }
 
 
-void PixelForwardTemplateSmearerPlugin::initializeForward()
+void PixelForwardTemplateSmearerPlugin::initialize()
 {
     rescotAlpha_binMin = 0.1;
     rescotAlpha_binWidth = 0.1;
@@ -110,37 +109,39 @@ void PixelForwardTemplateSmearerPlugin::initializeForward()
     resqbin_binWidth = 1;
     resqbin_binN = 4;
 
-    // Initialize the forward histos once and for all, and prepare the random generation
-    for ( unsigned cotalphaHistBin=1; cotalphaHistBin<=rescotAlpha_binN; ++cotalphaHistBin)
-    {
-        for ( unsigned cotbetaHistBin=1; cotbetaHistBin<=rescotBeta_binN; ++cotbetaHistBin)
-        {
-            for( unsigned qbinBin=1;  qbinBin<=resqbin_binN; ++qbinBin )
-            {
-                unsigned int edgePixelHistN = cotalphaHistBin*1000 +  cotbetaHistBin*10 +  qbinBin;
-                theXHistos[edgePixelHistN] = new SimpleHistogramGenerator((TH1F*)theEdgePixelResolutionFile->Get(Form("DQMData/clustFPIX/fhx0%u",edgePixelHistN)));
-                theYHistos[edgePixelHistN] = new SimpleHistogramGenerator((TH1F*)theEdgePixelResolutionFile->Get(Form("DQMData/clustFPIX/fhy0%u",edgePixelHistN)));
-                
-                unsigned int PixelHistN = 10000 + cotbetaHistBin*100 +  cotalphaHistBin*10 +  qbinBin;
-                theXHistos[PixelHistN] = new SimpleHistogramGenerator((TH1F*) theRegularPixelResolutionFile->Get(Form("hx0%u",PixelHistN)));
-                theYHistos[PixelHistN] = new SimpleHistogramGenerator((TH1F*) theRegularPixelResolutionFile->Get(Form("hy0%u",PixelHistN)));
-            }
-        }
-    }
+  theRegularPixelResolutions =
+    new PixelResolutionHistograms( theRegularPixelResolutionFileName.c_str(), "", 0, 0,
+                                      0.15,    //  const double cotbetaBinWidth = 0.15;
+                                      0.0,     //  const double cotbetaLowEdge  = 0.0 ;
+                                      4,       //  const int    cotbetaBins     = 4;
+                                      0.1,     //  const double cotalphaBinWidth        = 0.02 ;
+                                      0.1,     //  const double cotalphaLowEdge = -0.04 ;
+                                      4,       //  const int    cotalphaBins    = 4;
+                                      1,     //  const int    qbinWidth       = 1;
+                                      4);      //  const int    qbins           = 4;
 
-    for ( unsigned cotalphaHistBin=1; cotalphaHistBin<=rescotAlpha_binN; ++cotalphaHistBin)
-    {
-        for ( unsigned cotbetaHistBin=1; cotbetaHistBin<=rescotBeta_binN; ++cotbetaHistBin)
-        {
-            unsigned int SingleBigPixelHistN = 100000 + cotalphaHistBin*100 + cotbetaHistBin;
-            theXHistos[SingleBigPixelHistN] = new SimpleHistogramGenerator((TH1F*)theBigPixelResolutionFile->Get(Form("DQMData/clustFPIX/fhx%u",SingleBigPixelHistN)));
-            theYHistos[SingleBigPixelHistN] = new SimpleHistogramGenerator((TH1F*)theBigPixelResolutionFile->Get(Form("DQMData/clustFPIX/fhy%u",SingleBigPixelHistN)));
-            
-            unsigned int SinglePixelHistN = cotbetaHistBin*10 + cotalphaHistBin;
-            theXHistos[SinglePixelHistN]  = new SimpleHistogramGenerator((TH1F*)theRegularPixelResolutionFile->Get(Form("hx000%u",SinglePixelHistN)));
-            theYHistos[SinglePixelHistN]  = new SimpleHistogramGenerator((TH1F*)theRegularPixelResolutionFile->Get(Form("hy000%u",SinglePixelHistN)));
-        }
-    }
+  theBigPixelResolutions =
+    new PixelResolutionHistograms( theBigPixelResolutionFileName.c_str(), "", 0, 2,
+                                      0.15,    //  const double cotbetaBinWidth = 0.15;
+                                      0.0,     //  const double cotbetaLowEdge  = 0.0 ;
+                                      4,       //  const int    cotbetaBins     = 4;
+                                      0.1,     //  const double cotalphaBinWidth        = 0.02 ;
+                                      0.1,     //  const double cotalphaLowEdge = -0.04 ;
+                                      4,       //  const int    cotalphaBins    = 4;
+                                      0,     //  const int    qbinWidth       = 1;
+                                      0);      //  const int    qbins           = 4;
+
+  theEdgePixelResolutions =
+    new PixelResolutionHistograms( theEdgePixelResolutionFileName.c_str(), "", 0, 1,
+                                      0.15,    //  const double cotbetaBinWidth = 0.15;
+                                      0.0,     //  const double cotbetaLowEdge  = 0.0 ;
+                                      4,       //  const int    cotbetaBins     = 4;
+                                      0.1,     //  const double cotalphaBinWidth        = 0.02 ;
+                                      0.1,     //  const double cotalphaLowEdge = -0.04 ;
+                                      4,       //  const int    cotalphaBins    = 4;
+                                      1,     //  const int    qbinWidth       = 1;
+                                      4);      //  const int    qbins           = 4;
+
 }
 
 DEFINE_EDM_PLUGIN(
